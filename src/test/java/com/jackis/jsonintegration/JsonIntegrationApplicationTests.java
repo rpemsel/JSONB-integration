@@ -23,6 +23,8 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.util.TestPropertyValues;
@@ -43,6 +45,9 @@ import org.testcontainers.shaded.org.apache.commons.lang.RandomStringUtils;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ContextConfiguration(initializers = JsonIntegrationApplicationTests.DatabaseInitializer.class)
 class JsonIntegrationApplicationTests {
+
+  private static final Logger LOGGER = LoggerFactory
+      .getLogger(JsonIntegrationApplicationTests.class);
 
   private static final PostgreSQLContainer POSTGRE_SQL_CONTAINER;
 
@@ -88,6 +93,7 @@ class JsonIntegrationApplicationTests {
 
     final ObjectNode firstProduct = jacksonObjectMapper.createObjectNode();
     firstProduct.put("brand", "LuxuryBrand");
+    firstProduct.put("size", 43);
     firstProduct.set("colors", jacksonObjectMapper.createArrayNode().add("green").add("black"));
     firstProduct.set("weight",
         jacksonObjectMapper.createObjectNode().put("unit", "g").put("value", 43));
@@ -97,6 +103,7 @@ class JsonIntegrationApplicationTests {
 
     final ObjectNode secondProduct = jacksonObjectMapper.createObjectNode();
     secondProduct.put("brand", "NormalBrand");
+    secondProduct.put("size", 42);
     secondProduct.set("colors", jacksonObjectMapper.createArrayNode().add("blue").add("black"));
     secondProduct.set("weight",
         jacksonObjectMapper.createObjectNode().put("unit", "g").put("value", 42));
@@ -160,7 +167,7 @@ class JsonIntegrationApplicationTests {
   }
 
   @Test
-  void verifyUsageOfIndex() throws InterruptedException {
+  void verifyUsageOfIndexes() {
 
     /* to see the GIN index being used there must be a few entries in the database. Also using
      *  plain JDBC here for entering the rows into the database because this is much faster than
@@ -171,15 +178,32 @@ class JsonIntegrationApplicationTests {
        product table the index is really used. */
     jdbcTemplate.update("ANALYZE product;");
 
-    /* Wait to be sure to have updated table statistics */
-    //    Thread.sleep(5000L);
-
-    final List<String> result = jdbcTemplate.queryForList(
-        "EXPLAIN (ANALYZE, BUFFERS) SELECT * FROM product "
+    final List<String> resultSearch = jdbcTemplate.queryForList(
+        "EXPLAIN (ANALYZE, BUFFERS, COSTS, VERBOSE) SELECT * FROM product "
             + "WHERE attributes @> CAST('{ \"colors\": [\"green\"] }' AS JSONB)",
         String.class);
 
-    assertThat(String.join(" ", result)).containsIgnoringCase("index");
+    final String concatenatedSearchResult = String.join(" ", resultSearch);
+    LOGGER.info(concatenatedSearchResult);
+    assertThat(concatenatedSearchResult).containsIgnoringCase("product_attributes_idx");
+
+    final List<String> resultRangeNoIndex = jdbcTemplate.queryForList(
+        "EXPLAIN (ANALYZE, BUFFERS, COSTS, VERBOSE) SELECT * FROM product "
+            + "WHERE CAST (attributes ->> 'size' AS INTEGER) > 42",
+        String.class);
+
+    final String concatenatedRangeNoIndex = String.join(" ", resultRangeNoIndex);
+    LOGGER.info(concatenatedRangeNoIndex);
+    assertThat(concatenatedRangeNoIndex).doesNotContain("index");
+
+    final List<String> resultRangeWithIndex = jdbcTemplate.queryForList(
+        "EXPLAIN (ANALYZE, BUFFERS, COSTS, VERBOSE) SELECT * FROM product "
+            + "WHERE CAST (attributes -> 'weight' ->> 'value' AS INTEGER) < 42",
+        String.class);
+
+    final String concatenatedRangeWithIndex = String.join(" ", resultRangeWithIndex);
+    LOGGER.info(concatenatedRangeWithIndex);
+    assertThat(concatenatedRangeWithIndex).contains("product_weight_idx");
   }
 
   private HttpStatus insertProduct(final Product product) {
@@ -212,7 +236,7 @@ class JsonIntegrationApplicationTests {
                   .put("color", RandomStringUtils.random(10, true, true))
                   .put("brand", RandomStringUtils.random(10, true, true))
                   .set("weight", jacksonObjectMapper.createObjectNode().put("unit", "g")
-                      .put("value", random.nextInt(10000)));
+                      .put("value", random.nextInt(1000)));
 
               try {
                 return new Object[]{UUID.randomUUID().toString(),

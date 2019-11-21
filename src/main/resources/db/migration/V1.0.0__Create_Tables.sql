@@ -7,3 +7,4 @@ CREATE TABLE product (
  );
 
 CREATE INDEX product_attributes_idx ON product USING GIN (attributes jsonb_ops);
+CREATE INDEX product_weight_idx ON product USING BTREE((((attributes -> 'weight' ->> 'value'::text))::integer))
