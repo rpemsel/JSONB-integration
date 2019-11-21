@@ -4,4 +4,4 @@ CREATE TABLE product (
   attributes JSONB
  );
 
-CREATE INDEX product_attributes_idx ON product USING GIN (attributes);
+CREATE INDEX product_attributes_idx ON product USING GIN (attributes jsonb_ops);

@@ -79,7 +79,7 @@ class JsonIntegrationApplicationTests {
     insertProduct(new Product(UUID.randomUUID().toString(),
         jacksonObjectMapper.createObjectNode().put("color", "green")));
 
-    IntStream.range(0, 500).forEach(idx -> insertProduct(new Product(UUID.randomUUID().toString(),
+    IntStream.range(0, 10000).forEach(idx -> insertProduct(new Product(UUID.randomUUID().toString(),
         jacksonObjectMapper.createObjectNode().put("color", UUID.randomUUID().toString()))));
   }
 
