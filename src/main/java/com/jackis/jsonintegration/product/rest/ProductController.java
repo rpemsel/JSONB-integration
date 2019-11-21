@@ -1,6 +1,7 @@
 package com.jackis.jsonintegration.product.rest;
 
 import com.jackis.jsonintegration.json.JSONUtils;
+import com.jackis.jsonintegration.product.persistence.PriceEntity;
 import com.jackis.jsonintegration.product.persistence.ProductEntity;
 import com.jackis.jsonintegration.product.persistence.ProductRepository;
 import org.slf4j.Logger;
@@ -48,21 +49,28 @@ public class ProductController {
       return ResponseEntity.noContent().build();
     } else {
       return ResponseEntity.ok().body(productEntities.stream()
-          .map(product -> new Product(product.getSku(), product.getAttributes()))
+          .map(product -> new Product(product.getSku(),
+              new Price(product.getPriceEntity().getValue(),
+                  product.getPriceEntity().getCurrency()), product.getAttributes()))
           .collect(Collectors.toList()));
     }
   }
 
   @PostMapping
-  public final ResponseEntity createProduct (@RequestBody final Product product) {
+  public final ResponseEntity createProduct(@RequestBody final Product product) {
 
-      final ProductEntity productEntity = new ProductEntity();
-      productEntity.setSku(product.getSku());
-      productEntity.setAttributes(product.getAttributes());
+    final PriceEntity priceEntity = new PriceEntity();
+    priceEntity.setCurrency(product.getPrice().getCurrency());
+    priceEntity.setValue(product.getPrice().getValue());
 
-      productRepository.save(productEntity);
+    final ProductEntity productEntity = new ProductEntity();
+    productEntity.setSku(product.getSku());
+    productEntity.setPriceEntity(priceEntity);
+    productEntity.setAttributes(product.getAttributes());
 
-      return ResponseEntity.status(HttpStatus.CREATED).build();
+    productRepository.save(productEntity);
+
+    return ResponseEntity.status(HttpStatus.CREATED).build();
 
   }
 }

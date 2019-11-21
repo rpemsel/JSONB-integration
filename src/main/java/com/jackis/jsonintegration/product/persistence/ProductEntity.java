@@ -19,6 +19,9 @@ public class ProductEntity implements Serializable {
   @Column(unique = true, nullable = false)
   private String sku;
 
+  @Embedded
+  private PriceEntity priceEntity;
+
   @Column()
   @Type(type = "JsonNodeType")
   private JsonNode attributes;
@@ -37,6 +40,14 @@ public class ProductEntity implements Serializable {
 
   public void setSku(String sku) {
     this.sku = sku;
+  }
+
+  public PriceEntity getPriceEntity() {
+    return priceEntity;
+  }
+
+  public void setPriceEntity(PriceEntity priceEntity) {
+    this.priceEntity = priceEntity;
   }
 
   public JsonNode getAttributes() {
