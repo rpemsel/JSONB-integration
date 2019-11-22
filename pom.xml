@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.jackis</groupId>
-	<artifactId>json-integration</artifactId>
+	<artifactId>jsonb-integration</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
-	<name>json-integration</name>
-	<description>Demo project to show how to integrate JSONB fields into Hibernate</description>
+	<name>jsonb-integration</name>
+	<description>Demo project to show how to integrate JSONB fields into Hibernate and Spring boot</description>
 
 	<properties>
 		<java.version>11</java.version>
