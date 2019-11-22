@@ -92,24 +92,29 @@ class JsonIntegrationApplicationTests {
   void addTestData() {
 
     final ObjectNode firstProduct = jacksonObjectMapper.createObjectNode();
-    firstProduct.put("brand", "LuxuryBrand");
-    firstProduct.put("size", 43);
     firstProduct.set("colors", jacksonObjectMapper.createArrayNode().add("green").add("black"));
     firstProduct.set("weight",
         jacksonObjectMapper.createObjectNode().put("unit", "g").put("value", 43));
+    firstProduct.set("measures",
+        jacksonObjectMapper.createObjectNode().put("unit", "mm").put("height", 250)
+            .put("width", 300).put("depth", 150));
 
-    insertProduct(new Product(UUID.randomUUID().toString(), new Price(new BigDecimal(10), "EUR"),
+    insertProduct(new Product("Brown Toast 4000", UUID.randomUUID().toString(),
+        new Price(new BigDecimal(10), "EUR"),
         firstProduct));
 
     final ObjectNode secondProduct = jacksonObjectMapper.createObjectNode();
-    secondProduct.put("brand", "NormalBrand");
-    secondProduct.put("size", 42);
     secondProduct.set("colors", jacksonObjectMapper.createArrayNode().add("blue").add("black"));
     secondProduct.set("weight",
         jacksonObjectMapper.createObjectNode().put("unit", "g").put("value", 42));
+    secondProduct.set("measures",
+        jacksonObjectMapper.createObjectNode().put("unit", "mm").put("height", 300)
+            .put("width", 400).put("depth", 250));
 
-    insertProduct(new Product(UUID.randomUUID().toString(), new Price(new BigDecimal(0.99f), "EUR"),
-        secondProduct));
+    insertProduct(
+        new Product("Black Toast 2000", UUID.randomUUID().toString(),
+            new Price(new BigDecimal(0.99f), "EUR"),
+            secondProduct));
   }
 
   @AfterEach
@@ -118,11 +123,12 @@ class JsonIntegrationApplicationTests {
   }
 
   @Test
-  void searchProductBrand() throws URISyntaxException {
+  void searchProductWeightUnitGram() throws URISyntaxException {
 
     final URI uri = new URI("http://localhost:" + port
-        + "/products?attributeSearchParameter=" + URLEncoder.encode("{\"brand\":\"NormalBrand\"}",
-        StandardCharsets.UTF_8));
+        + "/products?attributeSearchParameter=" + URLEncoder
+        .encode("{\"weight\": { \"value\": 42 } }",
+            StandardCharsets.UTF_8));
 
     final List<Product> products = searchProduct(uri, response -> {
       final String responseBody = IOUtils
@@ -133,7 +139,7 @@ class JsonIntegrationApplicationTests {
 
     assertThat(products).hasSize(1);
     assertThat(products.get(0)).matches(product ->
-        "NormalBrand".equals(product.getAttributes().get("brand").asText())
+        product.getAttributes().get("weight").get("value").asInt() == 42
     );
 
   }
@@ -179,7 +185,7 @@ class JsonIntegrationApplicationTests {
     jdbcTemplate.update("ANALYZE product;");
 
     final List<String> resultSearch = jdbcTemplate.queryForList(
-        "EXPLAIN (ANALYZE, BUFFERS, COSTS, VERBOSE) SELECT * FROM product "
+        "EXPLAIN (ANALYZE, BUFFERS, COSTS, VERBOSE, FORMAT JSON) SELECT * FROM product "
             + "WHERE attributes @> CAST('{ \"colors\": [\"green\"] }' AS JSONB)",
         String.class);
 
@@ -188,8 +194,8 @@ class JsonIntegrationApplicationTests {
     assertThat(concatenatedSearchResult).containsIgnoringCase("product_attributes_idx");
 
     final List<String> resultRangeNoIndex = jdbcTemplate.queryForList(
-        "EXPLAIN (ANALYZE, BUFFERS, COSTS, VERBOSE) SELECT * FROM product "
-            + "WHERE CAST (attributes ->> 'size' AS INTEGER) > 42",
+        "EXPLAIN (ANALYZE, BUFFERS, COSTS, VERBOSE, FORMAT JSON) SELECT * FROM product "
+            + "WHERE CAST (attributes #> '{measures}' ->> 'height' AS INTEGER) < 250",
         String.class);
 
     final String concatenatedRangeNoIndex = String.join(" ", resultRangeNoIndex);
@@ -197,8 +203,8 @@ class JsonIntegrationApplicationTests {
     assertThat(concatenatedRangeNoIndex).doesNotContain("index");
 
     final List<String> resultRangeWithIndex = jdbcTemplate.queryForList(
-        "EXPLAIN (ANALYZE, BUFFERS, COSTS, VERBOSE) SELECT * FROM product "
-            + "WHERE CAST (attributes -> 'weight' ->> 'value' AS INTEGER) < 42",
+        "EXPLAIN (ANALYZE, BUFFERS, COSTS, VERBOSE, FORMAT JSON) SELECT * FROM product "
+            + "WHERE CAST (attributes #> '{weight}' ->> 'value' AS INTEGER) < 43",
         String.class);
 
     final String concatenatedRangeWithIndex = String.join(" ", resultRangeWithIndex);
@@ -232,14 +238,20 @@ class JsonIntegrationApplicationTests {
     List<Object[]> parameters = IntStream.range(0, 50_000)
         .boxed()
         .map(idx -> {
-              final JsonNode jsonNode = jacksonObjectMapper.createObjectNode()
-                  .put("color", RandomStringUtils.random(10, true, true))
-                  .put("brand", RandomStringUtils.random(10, true, true))
+              final ObjectNode jsonNode = jacksonObjectMapper.createObjectNode()
                   .set("weight", jacksonObjectMapper.createObjectNode().put("unit", "g")
                       .put("value", random.nextInt(1000)));
+              jsonNode.set("measures",
+                  jacksonObjectMapper.createObjectNode().put("unit", "mm")
+                      .put("height", random.nextInt(1000))
+                      .put("width", random.nextInt(1000)).put("depth", random.nextInt(1000)));
+              jsonNode.set("colors",
+                  jacksonObjectMapper.createArrayNode().add(RandomStringUtils.random(10, true, true))
+                      .add(RandomStringUtils.random(10, true, true)));
 
               try {
-                return new Object[]{UUID.randomUUID().toString(),
+                return new Object[]{RandomStringUtils.random(10, true, true),
+                    UUID.randomUUID().toString(),
                     new BigDecimal(random.nextFloat()),
                     jacksonObjectMapper.writeValueAsString(jsonNode)};
               } catch (JsonProcessingException exp) {
@@ -250,9 +262,9 @@ class JsonIntegrationApplicationTests {
             }
         ).collect(Collectors.toList());
 
-    jdbcTemplate.batchUpdate("INSERT INTO product (sku, price, currency, attributes) "
-            + "VALUES (?, ?, 'EUR', CAST(? AS JSONB))", parameters,
-        new int[]{Types.VARCHAR, Types.NUMERIC, Types.CLOB});
+    jdbcTemplate.batchUpdate("INSERT INTO product (name, sku, price, currency, attributes) "
+            + "VALUES (?, ?, ?, 'EUR', CAST(? AS JSONB))", parameters,
+        new int[]{Types.VARCHAR, Types.VARCHAR, Types.NUMERIC, Types.CLOB});
   }
 
 

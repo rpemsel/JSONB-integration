@@ -49,7 +49,7 @@ public class ProductController {
       return ResponseEntity.noContent().build();
     } else {
       return ResponseEntity.ok().body(productEntities.stream()
-          .map(product -> new Product(product.getSku(),
+          .map(product -> new Product(product.getName(), product.getSku(),
               new Price(product.getPriceEntity().getValue(),
                   product.getPriceEntity().getCurrency()), product.getAttributes()))
           .collect(Collectors.toList()));
@@ -64,6 +64,7 @@ public class ProductController {
     priceEntity.setValue(product.getPrice().getValue());
 
     final ProductEntity productEntity = new ProductEntity();
+    productEntity.setName(product.getName());
     productEntity.setSku(product.getSku());
     productEntity.setPriceEntity(priceEntity);
     productEntity.setAttributes(product.getAttributes());

@@ -16,6 +16,9 @@ public class ProductEntity implements Serializable {
   @Column
   private long id;
 
+  @Column(nullable = false)
+  private String name;
+
   @Column(unique = true, nullable = false)
   private String sku;
 
@@ -32,6 +35,14 @@ public class ProductEntity implements Serializable {
 
   public void setId(long id) {
     this.id = id;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
   public String getSku() {
