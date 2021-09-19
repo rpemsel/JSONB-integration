@@ -20,6 +20,24 @@
 		<assertj.version>3.11.1</assertj.version>
 	</properties>
 
+	<repositories>
+		<repository>
+			<id>orgRepo</id>
+			<name>Organisation Repo</name>
+			<url>https://development-artifact-repo-627739073141.d.codeartifact.eu-central-1.amazonaws.com/maven/development-artifact-repo</url>
+		</repository>
+	</repositories>
+
+	<distributionManagement>
+		<repository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>orgRepo</id>
+			<name>Organisation Repository</name>
+			<url>https://development-artifact-repo-627739073141.d.codeartifact.eu-central-1.amazonaws.com/maven/development-artifact-repo</url>
+			<layout>default</layout>
+		</repository>
+	</distributionManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
