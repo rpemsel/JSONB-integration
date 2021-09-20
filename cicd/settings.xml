@@ -3,29 +3,29 @@
     <localRepository>/mnt</localRepository>
     <servers>
         <server>
-            <id>orgRepo</id>
+            <id>artifactRepo</id>
             <username>aws</username>
             <password>env.CODEARTIFACT_AUTH_TOKEN</password>
         </server>
     </servers>
     <mirrors>
         <mirror>
-            <id>orgRepo</id>
-            <name>development-artifact-repo-development-artifact-repo</name>
+            <id>artifactRepo</id>
+            <name>artifact-repo-development-artifact-repo</name>
             <url>https://development-artifact-repo-627739073141.d.codeartifact.eu-central-1.amazonaws.com/maven/development-artifact-repo/</url>
             <mirrorOf>*</mirrorOf>
         </mirror>
     </mirrors>
     <profiles>
         <profile>
-            <id>development-artifact-repo-development-artifact-repo</id>
+            <id>artifact-repo</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
             <repositories>
                 <repository>
-                    <id>orgRepo</id>
-                    <url>https://development-artifact-repo-627739073141.d.codeartifact.eu-central-1.amazonaws.com/maven/development-artifact-repo/</url>
+                    <id>artifactRepo</id>
+                    <url>https://artifact-repo-627739073141.d.codeartifact.eu-central-1.amazonaws.com/maven/development-artifact-repo/</url>
                 </repository>
             </repositories>
         </profile>
