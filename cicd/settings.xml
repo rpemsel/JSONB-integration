@@ -12,7 +12,7 @@
         <mirror>
             <id>artifactRepo</id>
             <name>artifact-repo-development-artifact-repo</name>
-            <url>https://artifact-repo-627739073141.d.codeartifact.eu-central-1.amazonaws.com/maven/development-artifact-repo/</url>
+            <url>https://artifact-repo-627739073141.d.codeartifact.eu-central-1.amazonaws.com/maven/artifact-repo/</url>
             <mirrorOf>*</mirrorOf>
         </mirror>
     </mirrors>
@@ -25,7 +25,7 @@
             <repositories>
                 <repository>
                     <id>artifactRepo</id>
-                    <url>https://artifact-repo-627739073141.d.codeartifact.eu-central-1.amazonaws.com/maven/development-artifact-repo/</url>
+                    <url>https://artifact-repo-627739073141.d.codeartifact.eu-central-1.amazonaws.com/maven/artifact-repo/</url>
                 </repository>
             </repositories>
         </profile>
