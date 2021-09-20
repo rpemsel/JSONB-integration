@@ -22,7 +22,7 @@
 
 	<repositories>
 		<repository>
-			<id>artifact-repo</id>
+			<id>artifactRepo</id>
 			<name>Artifact Repository</name>
 			<url>https://artifact-repo-627739073141.d.codeartifact.eu-central-1.amazonaws.com/maven/artifact-repo</url>
 		</repository>
@@ -31,8 +31,8 @@
 	<distributionManagement>
 		<repository>
 			<uniqueVersion>false</uniqueVersion>
-			<id>artifact-repo</id>
-			<name>Organisation Repository</name>
+			<id>artifactRepo</id>
+			<name>Artifact Repository</name>
 			<url>https://artifact-repo-627739073141.d.codeartifact.eu-central-1.amazonaws.com/maven/artifact-repo</url>
 			<layout>default</layout>
 		</repository>
