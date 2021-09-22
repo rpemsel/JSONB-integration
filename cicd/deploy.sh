@@ -1,7 +1,5 @@
 #!/bin/bash
 
-echo "Running on branch $CODEBUILD_WEBHOOK_TRIGGER"
-
 if [[ $DEPLOYMENT_ENVIRONMENT == "production" ]]
 then
   echo "Deploying to production..."
