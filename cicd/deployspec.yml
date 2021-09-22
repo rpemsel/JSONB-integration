@@ -18,4 +18,5 @@ phases:
   build:
     commands:
       - helm version
+      - chmod 755 ./cicd/deploy.sh
       - ./cicd/deploy.sh
