@@ -11,21 +11,21 @@
     <mirrors>
         <mirror>
             <id>orgRepo</id>
-            <name>development-artifact-repo-development-artifact-repo</name>
-            <url>https://development-artifact-repo-627739073141.d.codeartifact.eu-central-1.amazonaws.com/maven/development-artifact-repo/</url>
+            <name>development-artifact-repo-artifact-repo</name>
+            <url>https://artifact-repo-627739073141.d.codeartifact.eu-central-1.amazonaws.com/maven/artifact-repo/</url>
             <mirrorOf>*</mirrorOf>
         </mirror>
     </mirrors>
     <profiles>
         <profile>
-            <id>development-artifact-repo-development-artifact-repo</id>
+            <id>development-artifact-repo-artifact-repo</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
             <repositories>
                 <repository>
                     <id>orgRepo</id>
-                    <url>https://development-artifact-repo-627739073141.d.codeartifact.eu-central-1.amazonaws.com/maven/development-artifact-repo/</url>
+                    <url>https://artifact-repo-627739073141.d.codeartifact.eu-central-1.amazonaws.com/maven/artifact-repo/</url>
                 </repository>
             </repositories>
         </profile>
