@@ -16,3 +16,8 @@ phases:
   post_build:
     commands:
       - mvn deploy -DskipTests
+reports:
+  junit:
+    files:
+      - target/surefire-reports/*
+    file-format: JUNITXML
