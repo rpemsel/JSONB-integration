@@ -21,3 +21,6 @@ reports:
     files:
       - target/surefire-reports/*
     file-format: JUNITXML
+cache:
+  paths:
+    - '/mvn-repo/**/*'
