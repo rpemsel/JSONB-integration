@@ -3,14 +3,14 @@
     <localRepository>/mnt</localRepository>
     <servers>
         <server>
-            <id>orgRepo</id>
+            <id>artifact-repo</id>
             <username>aws</username>
             <password>env.CODEARTIFACT_AUTH_TOKEN</password>
         </server>
     </servers>
     <mirrors>
         <mirror>
-            <id>orgRepo</id>
+            <id>artifact-repo</id>
             <name>artifact-repo</name>
             <url>https://artifact-repo-627739073141.d.codeartifact.eu-central-1.amazonaws.com/maven/artifact-repo/</url>
             <mirrorOf>*</mirrorOf>
