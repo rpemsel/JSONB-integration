@@ -18,11 +18,11 @@ phases:
       - echo "deb https://baltocdn.com/helm/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list
       - apt-get update
       - apt-get install helm
-      - docker build
   build:
     commands:
       - helm version
       - chmod 755 ./cicd/deploy.sh
       - mvn org.apache.maven.plugins:maven-dependency-plugin:2.1:get -Dartifact=com.jackis:jsonb-integration:1.0.0-SNAPSHOT
+      - docker build -t jsonb-integration .
       - ls -lisah
       - ./cicd/deploy.sh
