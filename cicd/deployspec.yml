@@ -22,7 +22,8 @@ phases:
     commands:
       - helm version
       - chmod 755 ./cicd/deploy.sh
-      - mvn org.apache.maven.plugins:maven-dependency-plugin:2.1:get -Dartifact=com.jackis:jsonb-integration:1.0.0-SNAPSHOT -DremoteRepositories=artifact-repo::default::https://artifact-repo-627739073141.d.codeartifact.eu-central-1.amazonaws.com/maven/artifact-repo/
+      - echo $CODEARTIFACT_AUTH_TOKEN
+      - wget --user aws --password "$CODEARTIFACT_AUTH_TOKEN" https://artifact-repo-627739073141.d.codeartifact.eu-central-1.amazonaws.com/maven/artifact-repo/com/jackis/jsonb-integration/1.0.0-SNAPSHOT/jsonb-integration-1.0.0-SNAPSHOT.jar
       - docker build -t jsonb-integration .
       - ls -lisah
       - ./cicd/deploy.sh
