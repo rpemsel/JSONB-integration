@@ -22,8 +22,6 @@ phases:
     commands:
       - helm version
       - chmod 755 ./cicd/deploy.sh
-      - echo $CODEARTIFACT_AUTH_TOKEN
-      - aws codeartifact get-package-version-asset --domain artifact-repo --repository artifact-repo --format maven --package com.jackis:jsonb-integration --package-version 1.0.0-SNAPSHOT --asset 'jsonb-integration-1.0.0-SNAPSHOT.jar' jsonb-integration.jar
+      - aws codeartifact get-package-version-asset --domain artifact-repo --repository artifact-repo --format maven --namespace com.jackis --package jsonb-integration --package-version 1.0.0-SNAPSHOT --asset 'jsonb-integration-1.0.0-SNAPSHOT.jar' jsonb-integration.jar
       - docker build -t jsonb-integration .
-      - ls -lisah
       - ./cicd/deploy.sh
