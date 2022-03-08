@@ -1,6 +1,9 @@
 version: 0.2
 env:
   shell: "bash"
+  secrets-manager:
+    KUBE_CONFIG: cicd-secrets:KUBE_CONFIG
+
 phases:
   install:
     runtime-versions:

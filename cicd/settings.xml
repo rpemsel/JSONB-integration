@@ -1,6 +1,6 @@
 <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
-    <localRepository>/mvn-repo</localRepository>
+    <localRepository>/mnt</localRepository>
     <servers>
         <server>
             <id>artifact-repo</id>
@@ -24,7 +24,7 @@
             </activation>
             <repositories>
                 <repository>
-                    <id>orgRepo</id>
+                    <id>artifact-repo</id>
                     <url>https://artifact-repo-627739073141.d.codeartifact.eu-central-1.amazonaws.com/maven/artifact-repo/</url>
                 </repository>
             </repositories>
