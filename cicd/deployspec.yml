@@ -21,9 +21,9 @@ phases:
       - export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain artifact-repo --domain-owner 627739073141 --query authorizationToken --output text` && sed -i "s/env.CODEARTIFACT_AUTH_TOKEN/$CODEARTIFACT_AUTH_TOKEN/g" ~/.m2/settings.xml
   build:
     commands:
-      - helm version
       - chmod 755 ./cicd/deploy.sh
       - export ASSET=`aws codeartifact list-package-version-assets --domain artifact-repo --domain-owner 627739073141 --repository artifact-repo --format maven --namespace com.jackis --package jsonb-integration --package-version 1.0.0-SNAPSHOT | jq -r .assets[0].name`
       - aws codeartifact get-package-version-asset --domain artifact-repo --repository artifact-repo --format maven --namespace com.jackis --package jsonb-integration --package-version 1.0.0-SNAPSHOT --asset "${ASSET}" jsonb-integration.jar
       - docker build -t jsonb-integration .
+      - helm version
       - ./cicd/deploy.sh
