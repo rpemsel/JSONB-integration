@@ -9,15 +9,16 @@ phases:
     runtime-versions:
       java: corretto11
       python: 3.9
-  pre_build:
     commands:
-      - cp ./cicd/settings.xml ~/.m2/
-      - export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain artifact-repo --domain-owner 627739073141 --query authorizationToken --output text` && sed -i "s/env.CODEARTIFACT_AUTH_TOKEN/$CODEARTIFACT_AUTH_TOKEN/g" ~/.m2/settings.xml
       - curl https://baltocdn.com/helm/signing.asc | apt-key add -
       - apt-get install apt-transport-https --yes
       - echo "deb https://baltocdn.com/helm/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list
       - apt-get update
       - apt-get install helm
+  pre_build:
+    commands:
+      - cp ./cicd/settings.xml ~/.m2/
+      - export CODEARTIFACT_AUTH_TOKEN=`aws codeartifact get-authorization-token --domain artifact-repo --domain-owner 627739073141 --query authorizationToken --output text` && sed -i "s/env.CODEARTIFACT_AUTH_TOKEN/$CODEARTIFACT_AUTH_TOKEN/g" ~/.m2/settings.xml
   build:
     commands:
       - helm version
